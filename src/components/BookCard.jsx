@@ -24,7 +24,7 @@ export default function BookCard({ book, onEdit, onDelete, onBorrow, userRole, i
           </p>
         )}
         <p className="text-gray-600">
-          <span className="font-medium">Copies:</span> {book.copies_count} copies
+          <span className="font-medium">Copies:</span> {book.copies_count || 0}
         </p>
       </div>
 
@@ -46,11 +46,16 @@ export default function BookCard({ book, onEdit, onDelete, onBorrow, userRole, i
           </>
         )}
 
-        {book.copies_count > 0 ? (
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-medium">
-            {book.copies_count} copies available
-          </span>
-        ) : (
+        {isAuthenticated && userRole === "Member" && book.copies_count > 0 && (
+          <button
+            onClick={() => onBorrow(book.id)}
+            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+          >
+            Borrow
+          </button>
+        )}
+
+        {book.copies_count === 0 && (
           <span className="bg-gray-300 text-gray-600 px-3 py-1 rounded text-sm">
             No copies available
           </span>

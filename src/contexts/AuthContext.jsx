@@ -12,44 +12,46 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
-  // Verificar si hay token al cargar la app
   useEffect(() => {
-    if (token) {
-      // Aquí podrías hacer una llamada para validar el token
-      // Por ahora asumimos que si hay token, hay usuario
-      const role = localStorage.getItem('role');
-      setUser({ role });
-    }
     setLoading(false);
-  }, [token]);
+  }, []);
 
   const login = (tokenData, userData) => {
     localStorage.setItem('token', tokenData);
-    localStorage.setItem('role', userData.role);
+    localStorage.setItem('user', JSON.stringify(userData));
     setToken(tokenData);
     setUser(userData);
   };
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
+  }, [token]);
+
   const logout = async () => {
     try {
-      await logoutAPI(); // Llamada a la API para logout
+      await logoutAPI();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('token');
-      localStorage.removeItem('role');
+      localStorage.removeItem('user');
       setToken(null);
       setUser(null);
     }
   };
 
-  const isAuthenticated = () => {
-    return !!token;
-  };
+  const isAuthenticated = () => !!token;
 
   const value = {
     user,
@@ -57,14 +59,10 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     isAuthenticated,
-    loading
+    loading,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext };

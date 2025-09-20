@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import * as API from "../api/books";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../contexts/AuthContext";
+import * as API from "../api/books";
 
 export default function BookFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const userRole = user?.roles?.[0];
+
   const [book, setBook] = useState({
     title: "",
     item_type_id: null,
@@ -18,6 +22,12 @@ export default function BookFormPage() {
   const [error, setError] = useState(null);
 
   const isEditMode = !!id;
+
+  useEffect(() => {
+    if (!isAuthenticated() || userRole !== "Librarian") {
+      navigate("/books");
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   useEffect(() => {
     if (id) {
@@ -46,7 +56,6 @@ export default function BookFormPage() {
     setLoading(true);
     setError(null);
 
-    // Basic validation
     if (!book.title.trim() || !book.author.trim()) {
       setError("Title and Author are required");
       setLoading(false);
@@ -54,7 +63,6 @@ export default function BookFormPage() {
     }
 
     try {
-      // Prepare the book data with proper structure
       const bookData = {
         title: book.title.trim(),
         item_type_id: book.item_type_id,
@@ -69,6 +77,7 @@ export default function BookFormPage() {
       } else {
         await API.createBook(bookData);
       }
+
       navigate("/books");
     } catch (err) {
       console.error("Error saving book:", err);
@@ -86,8 +95,8 @@ export default function BookFormPage() {
     return (
       <div>
         <Navbar />
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading book details...</div>
+        <div className="flex justify-center items-center h-64 text-lg">
+          Loading book details...
         </div>
       </div>
     );
@@ -150,7 +159,7 @@ export default function BookFormPage() {
                 name="genre"
                 type="text"
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter genre (e.g., Fiction, Science Fiction, Romance)"
+                placeholder="Enter genre (optional)"
                 value={book.genre}
                 onChange={handleChange}
               />
@@ -171,14 +180,13 @@ export default function BookFormPage() {
               />
             </div>
 
-
             <div className="flex space-x-4 pt-4">
               <button
                 type="submit"
                 disabled={loading}
                 className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? "Saving..." : (isEditMode ? "Update Book" : "Create Book")}
+                {loading ? "Saving..." : isEditMode ? "Update Book" : "Create Book"}
               </button>
               <button
                 type="button"

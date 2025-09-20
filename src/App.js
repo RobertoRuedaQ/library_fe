@@ -6,9 +6,8 @@ import BooksPage from './pages/BooksPage';
 import BookShowPage from './pages/BookShowPage';
 import BookFormPage from './pages/BookFormPage';
 import BorrowingsPage from './pages/BorrowingsPage';
-import DashboardPage from './pages/DashboardPage'; // Asumiendo que tienes esta página
+import DashboardPage from './pages/DashboardPage';
 
-// Componente para rutas protegidas
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -19,7 +18,6 @@ function ProtectedRoute({ children }) {
   return isAuthenticated() ? children : <Navigate to="/login" />;
 }
 
-// Componente para rutas públicas (solo accesibles sin autenticar)
 function PublicRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -30,10 +28,8 @@ function PublicRoute({ children }) {
   return !isAuthenticated() ? children : <Navigate to="/dashboard" />;
 }
 
-// Componente para rutas solo de bibliotecarios
 function LibrarianRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
-  const role = localStorage.getItem("role");
+  const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -43,12 +39,14 @@ function LibrarianRoute({ children }) {
     return <Navigate to="/login" />;
   }
 
-  if (role !== "Librarian") {
+  const userRole = user?.roles?.[0];
+  if (userRole !== "Librarian") {
     return <Navigate to="/books" />;
   }
 
   return children;
 }
+
 
 function AppRoutes() {
   return (

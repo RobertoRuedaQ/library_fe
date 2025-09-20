@@ -39,7 +39,7 @@ export default function BorrowingsPage() {
     setRenewingBorrowing(borrowingId);
     try {
       await BorrowingAPI.renewBorrowing(borrowingId);
-      await loadBorrowings(); // Refresh the list
+      await loadBorrowings();
     } catch (err) {
       console.error("Error renewing borrowing:", err);
       alert("Failed to renew borrowing");
@@ -52,7 +52,7 @@ export default function BorrowingsPage() {
     if (window.confirm("Are you sure you want to return this book?")) {
       try {
         await BorrowingAPI.returnBorrowing(borrowingId);
-        await loadBorrowings(); // Refresh the list
+        await loadBorrowings();
       } catch (err) {
         console.error("Error returning borrowing:", err);
         alert("Failed to return book");

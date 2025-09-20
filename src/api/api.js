@@ -12,7 +12,6 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Public API instance for endpoints that don't require authentication
 export const PublicAPI = axios.create({
   baseURL: "http://localhost:3000/api/v1",
 });

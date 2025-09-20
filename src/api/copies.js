@@ -1,6 +1,16 @@
-import API, { PublicAPI } from "./api";
+import API from "./api";
 
-export const fetchBookCopies = (bookId) => PublicAPI.get(`/books/${bookId}/copies`);
-export const fetchCopy = (copyId) => PublicAPI.get(`/copies/${copyId}`);
-export const updateCopy = (copyId, copyData) => API.patch(`/copies/${copyId}`, { copy: copyData });
-export const deleteCopy = (copyId) => API.delete(`/copies/${copyId}`);
+export const fetchCopies = (bookId) => {
+    return API.get(`/books/${bookId}/copies`);
+};
+export const createCopy = (bookId, copyData) =>
+    API.post(`/books/${bookId}/copies`, { copy: copyData });
+
+export const getCopy = (id) =>
+    API.get(`/copies/${id}`);
+
+export const updateCopy = (id, copyData) =>
+    API.put(`/copies/${id}`, { copy: copyData });
+
+export const deleteCopy = (id) =>
+    API.delete(`/copies/${id}`);
