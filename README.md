@@ -1,70 +1,139 @@
-# Getting Started with Create React App
+# Library Management System - Project Documentation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+This project is a library management web application built with React and React Router. The system enables the management of books, users, and borrowings with different access levels based on user roles.
 
-In the project directory, you can run:
+## Technologies Used
 
-### `npm start`
+- **React**: Main framework for user interface development
+- **React Router DOM**: Route management and navigation in the application
+- **Context API**: Global authentication state management
+- **Tailwind CSS**: Styling framework (evidenced by CSS classes)
+- **Local Storage**: Local storage for tokens and user data
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project Architecture
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Route Structure
 
-### `npm test`
+The system is organized with the following main routes:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `/login` - Login page
+- `/register` - User registration page
+- `/dashboard` - Main dashboard (requires authentication)
+- `/books` - Book catalog (public)
+- `/books/:id` - Specific book details
+- `/books/new` - Form to create new book (librarians only)
+- `/books/:id/edit` - Form to edit book (librarians only)
+- `/borrowings` - Borrowing management (requires authentication)
 
-### `npm run build`
+### Authentication and Authorization System
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Types of Protected Routes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Public Routes (PublicRoute)**
+   - Accessible only to non-authenticated users
+   - Redirect to dashboard if user is already logged in
+   - Apply to: Login and Register
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. **Protected Routes (ProtectedRoute)**
+   - Require authentication
+   - Redirect to login if no valid token exists
+   - Apply to: Dashboard and Borrowings
 
-### `npm run eject`
+3. **Librarian Routes (LibrarianRoute)**
+   - Require authentication AND "Librarian" role
+   - Redirect to catalog if requirements not met
+   - Apply to: Book creation and editing
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### Authentication Context
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The `AuthContext` provides:
+- `isAuthenticated()`: Function to verify if user is authenticated
+- `user`: Object with current user information
+- `loading`: Loading state to show appropriate indicators
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Core Functionalities
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. User Management
+- **New user registration**: Publicly accessible registration form
+- **Login**: Authentication with locally stored token
+- **Differentiated roles**: System with User and Librarian roles
 
-## Learn More
+### 2. Book Management
+- **Public catalog**: Book viewing available without authentication
+- **Book details**: Complete information for each book
+- **CRUD for librarians**: 
+  - Create new books
+  - Edit existing books
+  - (Presumably delete, though not visible in routes)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 3. Borrowing System
+- **Borrowing management**: Dedicated page for authenticated users
+- **Access control**: Only registered users can access
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 4. Dashboard
+- **Main panel**: Personalized area for authenticated users
+- **Entry point**: Automatic redirection after successful login
 
-### Code Splitting
+## Implemented Improvements
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Original Version vs. Enhanced Version
 
-### Analyzing the Bundle Size
+**Main changes in the second version:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. **Better Context API integration**:
+   - Elimination of direct localStorage access
+   - Use of custom hooks from auth context
 
-### Making a Progressive Web App
+2. **Improved loading states**:
+   - Loading indicators during authentication verification
+   - Better user experience
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. **Smart public routes**:
+   - Prevention of access to login/register if already authenticated
+   - Automatic redirection to dashboard
 
-### Advanced Configuration
+4. **Cleaner structure**:
+   - Separation of route components
+   - Better code organization
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+5. **Enhanced role verification**:
+   - Use of `user.roles[0]` structure instead of direct localStorage
+   - Greater security in permission verification
 
-### Deployment
+## Configuration and Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### File Structure
 
-### `npm run build` fails to minify
+```
+src/
+├── contexts/
+│   └── AuthContext.js      # Authentication context
+├── pages/
+│   ├── LoginPage.js        # Login page
+│   ├── RegisterPage.js     # Registration page
+│   ├── DashboardPage.js    # Main dashboard
+│   ├── BooksPage.js        # Book catalog
+│   ├── BookShowPage.js     # Book details
+│   ├── BookFormPage.js     # Book form
+│   └── BorrowingsPage.js   # Borrowing management
+└── App.js                  # Main component with routes
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Navigation Flow
+
+1. **Non-authenticated user**: Accesses public catalog or registers/logs in
+2. **Authenticated user**: Accesses dashboard, can view borrowings and complete catalog
+3. **Librarian**: All previous functionalities + book CRUD management
+
+## Security Considerations
+
+- Tokens stored in localStorage for session persistence
+- Role verification both in frontend and (presumably) backend
+- Protection of sensitive routes with wrapper components
+- Automatic redirections to prevent unauthorized access
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
